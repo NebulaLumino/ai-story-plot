@@ -1,14 +1,13 @@
 'use client';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
-  const [f1, setF1] = useState('');
-  const [f2, setF2] = useState('');
-  const [f3, setF3] = useState('');
-  const [f4, setF4] = useState('');
+const [Genre, setGenre] = useState('');
+const [ProtagonistArchetype, setProtagonistArchetype] = useState('');
+const [Setting, setSetting] = useState('');
+const [ConflictType, setConflictType] = useState('');
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
-  const btnLabel = loading ? 'Generating...' : 'Generate';
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
@@ -18,13 +17,11 @@ export default function Home() {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ f1, f2, f3, f4 })
+        body: JSON.stringify({ genre, protagonist_archetype, setting, conflict_type }),
       });
       const data = await res.json();
       setOutput(data.result || data.error || 'No response');
-    } catch(e: any) {
-      setOutput('Error: ' + e.message);
-    }
+    } catch(e: any) { setOutput('Error: ' + e.message); }
     setLoading(false);
   }
 
@@ -32,27 +29,17 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-gray-900 text-white flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-16">
         <div className="w-full max-w-2xl">
-          <h1 className="text-3xl font-bold mb-2">AI Story Plot Generator</h1>
-          <p className="text-gray-400 mb-8">Craft compelling story plots with unique protagonist archetypes, settings, and conflict dynamics.</p>
+          <h1 className="text-3xl font-bold mb-2">Story Plot Generator</h1>
+          <p className="text-gray-400 mb-8">Generate detailed story plots with subplot structure and character arcs.</p>
           <form onSubmit={handleGenerate} className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Genre</label>
-              <input value={f1} onChange={(e) => setF1(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Type here..." />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Protagonist Archetype</label>
-              <input value={f2} onChange={(e) => setF2(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Type here..." />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Setting</label>
-              <input value={f3} onChange={(e) => setF3(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Type here..." />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Conflict Type</label>
-              <input value={f4} onChange={(e) => setF4(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Type here..." />
-            </div>
-            <button type="submit" disabled={loading} className="w-full py-3 rounded-lg font-semibold text-white disabled:opacity-50 bg-teal-600">
-              {btnLabel}
+            <div><label className="block text-sm text-gray-400 mb-1">Genre</label><input value={Genre} onChange={e=>setGenre(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Enter genre..." /></div>
+            <div><label className="block text-sm text-gray-400 mb-1">Protagonist Archetype</label><input value={ProtagonistArchetype} onChange={e=>setProtagonistArchetype(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Enter protagonist archetype..." /></div>
+            <div><label className="block text-sm text-gray-400 mb-1">Setting</label><input value={Setting} onChange={e=>setSetting(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Enter setting..." /></div>
+            <div><label className="block text-sm text-gray-400 mb-1">Conflict Type</label><input value={ConflictType} onChange={e=>setConflictType(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Enter conflict type..." /></div>
+            <button type="submit" disabled={loading}
+              className="w-full py-3 rounded-lg font-semibold text-white disabled:opacity-50 transition-opacity"
+              style={backgroundColor: 'hsl(175,55%,45%)'}>
+              {loading ? 'Generating...' : 'Generate'}
             </button>
           </form>
           {output && (

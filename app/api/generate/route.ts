@@ -1,37 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-let _clientPromise: Promise<any> | null = null;
-
+let _client: any = null;
 async function getClient() {
-  if (!_clientPromise) {
-    _clientPromise = (async () => {
-      const { default: OpenAI } = await import('openai');
-      return new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-        baseURL: 'https://api.deepseek.com/v1'
-      });
-    })();
+  if (!_client) {
+    const { default: OpenAI } = await import('openai');
+    _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, baseURL: 'https://api.deepseek.com/v1' });
   }
-  return _clientPromise;
+  return _client;
 }
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const f1: string = body.f1 || '';
-    const f2: string = body.f2 || '';
-    const f3: string = body.f3 || '';
-    const f4: string = body.f4 || '';
-    const userContent = `Genre: ${f1}\nProtagonist Archetype: ${f2}\nSetting: ${f3}\nConflict Type: ${f4}`;
     const client = await getClient();
     const completion = await client.chat.completions.create({
       model: 'deepseek-chat',
-      messages: [
-        { role: 'system', content: 'You are a master storyteller and plot architect. Given genre, protagonist archetype, setting, and conflict type, generate a detailed story plot outline including: premise, protagonist journey, key plot beats (setup, inciting incident, rising action, climax, resolution), supporting characters, and thematic resonance. Format with clear sections.' },
-        { role: 'user', content: userContent },
-      ]
+      messages: [{ role: 'user', content: 'You are an expert screenwriter and story architect.
+
+Input fields: genre, protagonist_archetype, setting, conflict_type.' + "\\n\\nData: " + JSON.stringify(body) }],
     });
     return NextResponse.json({ result: completion.choices[0].message.content });
-  } catch (err: any) {
+  } catch(err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
